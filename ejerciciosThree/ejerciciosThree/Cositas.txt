@@ -1,0 +1,2 @@
+Para abrir las pracs: 
+python script-server3.py
