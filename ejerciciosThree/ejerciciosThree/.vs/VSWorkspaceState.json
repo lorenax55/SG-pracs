@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\grapadora"
+    "\\geometria basica",
+    "\\grapadora",
+    "\\introduccion"
   ],
-  "SelectedNode": "\\grapadora\\Grapadora.js",
+  "SelectedNode": "\\geometria basica\\MyGeometries.js",
   "PreviewInSolutionExplorer": false
 }
