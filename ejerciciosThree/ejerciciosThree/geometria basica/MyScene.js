@@ -8,7 +8,7 @@ import { Stats } from '../libs/stats.module.js'
 
 // Clases de mi proyecto
 
-import { BoxGeometry, CylinderGeometry  } from './MyGeometries.js'
+import { BoxGeometry, CylinderGeometry, IcoGeometry, TorusGeometry } from './MyGeometries.js'
 
  
 /// La clase fachada del modelo
@@ -63,6 +63,18 @@ class MyScene extends THREE.Scene {
         // Posicionar el cilindro
         cylinder.position.set(2, 0, 0);
         this.models.push(cylinder); // Agregar el cilindro al array de modelos
+
+        const ico = new IcoGeometry(this.gui, "Controles del Icosaedro");
+        this.add(ico);
+        // Posicionar el icosaedro
+        ico.position.set(-2, 4, 0);
+        this.models.push(ico); // Agregar el icosaedro al array de modelos
+
+        const toro = new TorusGeometry(this.gui, "Controles del Toro");
+        this.add(toro);
+        // Posicionar el toro
+        toro.position.set(2, 4, 0);
+        this.models.push(toro); // Agregar el cilindro al array de modelos
     
     }
   

@@ -2,9 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\geometria basica",
+    "\\geometria revolucion",
     "\\grapadora",
     "\\introduccion"
   ],
-  "SelectedNode": "\\geometria basica\\MyGeometries.js",
+  "SelectedNode": "\\geometria revolucion\\MyScene.js",
   "PreviewInSolutionExplorer": false
 }
