@@ -57,6 +57,9 @@ class MyScene extends THREE.Scene {
         // Añadir la geometría del peón al modelo
         this.add(rGeometry);
 
+        this.models.push(rGeometry); // Agregar la caja al array de modelos
+
+
     }
 
   

@@ -1,11 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\booleanos",
+    "\\cargar modelos",
+    "\\examen",
     "\\geometria basica",
+    "\\geometria extrusion",
     "\\geometria revolucion",
     "\\grapadora",
-    "\\introduccion"
+    "\\introduccion",
+    "\\pendulos"
   ],
-  "SelectedNode": "\\geometria revolucion\\MyScene.js",
+  "SelectedNode": "\\geometria extrusion\\ExtGeometry.js",
   "PreviewInSolutionExplorer": false
 }
