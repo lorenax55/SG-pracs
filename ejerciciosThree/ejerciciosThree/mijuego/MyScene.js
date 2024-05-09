@@ -271,7 +271,7 @@ class MyScene extends THREE.Scene {
     
     // Configurar el offset de altura y lateral dependiente del ángulo
     const verticalOffset = 0;  // Elevación fija, ajustable según necesidad
-    const lateralOffset = 0.2;   // Desplazamiento lateral para mantener la cámara alineada con el ángulo de PJ
+    const lateralOffset = 0.5;   // Desplazamiento lateral para mantener la cámara alineada con el ángulo de PJ
 
     // Combinar offsets para obtener la posición final de la cámara
     const cameraPosition = pjPosition.clone()
@@ -318,12 +318,12 @@ class MyScene extends THREE.Scene {
     switch(event.key) {
         case 'ArrowRight':
             // Aumentar el ángulo
-            scene.angle += 0.3;
+            scene.angle += 0.1;
             //console.log(scene.angle);
             break;
         case 'ArrowLeft':
             // Disminuir el ángulo
-            scene.angle -= 0.3;
+            scene.angle -= 0.1;
             //console.log(scene.angle);
             break;
     }
