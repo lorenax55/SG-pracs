@@ -11,6 +11,7 @@ import { TrackballControls } from '../libs/TrackballControls.js'
 import { Tubo } from './Tubo.js'
 import { PJ } from './PJ.js'
 import { Hoja } from './Hoja.js'
+import { Spike } from './Spike.js'
 
 
 
@@ -64,6 +65,7 @@ class MyScene extends THREE.Scene {
     this.curve = new THREE.CatmullRomCurve3(puntos, true); // true para que la curva sea cerrada
     const material_verde = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
     const material_verde2 = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    const material_pincho = new THREE.MeshPhongMaterial({ color: 0xf00f00 });
 
 
     this.model = new Tubo(this.curve, material_verde);
@@ -113,6 +115,22 @@ class MyScene extends THREE.Scene {
       // Añadir la hoja a la escena o a un objeto parent específico
       this.add(hoja);
   }
+
+  for (let i = 0; i < 15; i++) {
+    const spike = new Spike(material_pincho);
+
+    const t = Math.random();
+
+    spike.position.copy(this.curve.getPointAt(t));
+
+    spike.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
+
+    spike.rotation.x = Math.random() * Math.PI * 2; // Rotación aleatoria alrededor del eje x
+    spike.rotation.y = Math.random() * Math.PI * 2; // Rotación aleatoria alrededor del eje y
+    spike.rotation.z = Math.random() * Math.PI * 2; // Rotación aleatoria alrededor del eje z
+
+    this.add(spike);
+}
 
     
   }

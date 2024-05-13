@@ -9,6 +9,7 @@ import { Stats } from '../libs/stats.module.js'
 // Clases de mi proyecto
 
 import { BoxGeometry, CylinderGeometry, IcoGeometry, TorusGeometry } from './MyGeometries.js'
+import {Runa1} from '../mijuego/Runa1.js'
 
  
 /// La clase fachada del modelo
@@ -75,6 +76,13 @@ class MyScene extends THREE.Scene {
         // Posicionar el toro
         toro.position.set(2, 4, 0);
         this.models.push(toro); // Agregar el cilindro al array de modelos
+
+        const material1 = new THREE.MeshNormalMaterial({ flatShading: true });
+
+        const runa = new Runa1(material1);
+        runa.position.set(4,4,0);
+        this.add(runa);
+        
     
     }
   
