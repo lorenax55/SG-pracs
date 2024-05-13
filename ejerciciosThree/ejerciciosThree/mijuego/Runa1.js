@@ -3,26 +3,55 @@ import * as THREE from 'three';
 
 class Runa1 extends THREE.Object3D {
     constructor(material) {
-        super();
-        const path = new THREE.Path();
+        super();  // Importante llamar al constructor de la superclase primero
 
-        path.lineTo( 0, 95 );
-        path.lineTo( 0.05, 0.1 );
-        path.lineTo( 0.1, 0.95 );
-        path.lineTo( 0.3, 0.8 );
-		
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.lineTo(1, 0);
+        shape.lineTo(1, 2);
+        shape.lineTo(4, 5);
+        shape.lineTo(1, 8);
+        shape.lineTo(1, 10);
+        shape.lineTo(4, 7);
+        shape.lineTo(5, 7);
+        shape.lineTo(1, 11);
+        shape.lineTo(0, 11);
+        shape.lineTo(0, 8);
+        shape.lineTo(-3, 5);
+        shape.lineTo(0, 2);
+        shape.lineTo(0, 0);
 
-		// Define la forma que deseas extruir
-		var radius = 1; // Radio del tubo
-		var segments = 100; // Número de segmentos a lo largo del tubo
-		var closed = false; // Indica si el tubo está cerrado alrededor del camino
+        const holePath1 = new THREE.Path();
+        holePath1.moveTo(1,3);
+        holePath1.lineTo(3,5);
+        holePath1.lineTo(1,7);
+        holePath1.lineTo(1,3);
+        shape.holes.push(holePath1);
 
-		// Crea la geometría del tubo siguiendo la trayectoria
-		var tubeGeometry = new THREE.TubeGeometry(path, segments, radius, 8, closed);
-
-        const mesh = new THREE.Mesh(tubeGeometry, material);
-        this.add(mesh);
+        const holePath2 = new THREE.Path();
+        holePath2.moveTo(0,3);
+        holePath2.lineTo(-2,5);
+        holePath2.lineTo(0,7);
+        holePath2.lineTo(0,3);
+        shape.holes.push(holePath2);
         
+        const extrudeSettings = {
+            steps: 2,
+            depth: 1,
+            bevelEnabled: true,
+            bevelThickness: 0.01,
+            bevelSize: 0.1,
+            bevelOffset: 0,
+            bevelSegments: 1
+        };
+        
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        const runa = new THREE.Mesh(geometry, material);
+        runa.position.y = 0.6;
+        runa.scale.x = 0.8;
+        this.add(runa);
+
+
     }
 }
 
