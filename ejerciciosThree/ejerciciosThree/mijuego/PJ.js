@@ -20,7 +20,12 @@ class PJ extends THREE.Object3D {
 
         // Añade el mesh al objeto 3D (esto mismo, 'this')
         this.add(mesh);
+
+        this.health = 3; 
+
+
     }
+
 }
 
 export { PJ };

@@ -130,6 +130,14 @@ class MyScene extends THREE.Scene {
     spike.rotation.z = Math.random() * Math.PI * 2; // Rotación aleatoria alrededor del eje z
 
     this.add(spike);
+
+  
+    //COLISIONES
+    this.spike_colliders = [] ;
+    this.hojas_collider = [] ;
+    this.PJ_collider = new THREE.Box3().setFromObject(this.PJ);
+
+
 }
 
     
