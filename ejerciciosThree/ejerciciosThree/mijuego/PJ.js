@@ -22,8 +22,13 @@ class PJ extends THREE.Object3D {
         this.add(mesh);
 
         this.health = 3; 
+        
 
+    }
 
+    get_damage(){
+        this.health = this.health -1 ;
+        console.log(this.health);
     }
 
 }

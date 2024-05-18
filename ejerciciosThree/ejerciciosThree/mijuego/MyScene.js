@@ -94,6 +94,9 @@ class MyScene extends THREE.Scene {
     //controles
     this.angle = 0;
 
+    //COLISIONES
+    
+    this.hojas = []
     for (let i = 0; i < 15; i++) {
       // Crear una nueva instancia de Hoja
       const hoja = new Hoja(material_verde);
@@ -114,8 +117,12 @@ class MyScene extends THREE.Scene {
   
       // Añadir la hoja a la escena o a un objeto parent específico
       this.add(hoja);
+
+      this.hojas.push(hoja);
+
   }
 
+  this.spikes = []
   for (let i = 0; i < 15; i++) {
     const spike = new Spike(material_pincho);
 
@@ -130,15 +137,10 @@ class MyScene extends THREE.Scene {
     spike.rotation.z = Math.random() * Math.PI * 2; // Rotación aleatoria alrededor del eje z
 
     this.add(spike);
+    this.spikes.push(spike);
 
-  
-    //COLISIONES
-    this.spike_colliders = [] ;
-    this.hojas_collider = [] ;
-    this.PJ_collider = new THREE.Box3().setFromObject(this.PJ);
+  }
 
-
-}
 
     
   }
@@ -356,6 +358,11 @@ class MyScene extends THREE.Scene {
     //print(scene.angle);
   }
 
+  check_collisions(){
+
+
+  }
+
   update () {
     const time = Date.now() * 0.00001; // Controla la velocidad de la animación
 
@@ -367,6 +374,9 @@ class MyScene extends THREE.Scene {
 
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
+
+    //colision
+    this.check_collisions();
     
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
