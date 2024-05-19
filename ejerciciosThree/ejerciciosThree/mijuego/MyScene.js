@@ -73,6 +73,13 @@ class MyScene extends THREE.Scene {
 
     this.PJ = new PJ();
     this.add(this.PJ);
+    this.velocity = 0.00002;
+
+    const metaGeo = new THREE.BoxGeometry(0.2,3,3);
+    this.meta = new THREE.Mesh(metaGeo, material_verde2);
+    const time = Date.now() * 0.00001 +0.02;
+    this.meta.position.copy(this.curve.getPointAt(time % 1));
+    this.add( this.meta);
 
     // Crear un nuevo tubo con la nueva curva
     const newTube1 = new Tubo(this.curve, material_verde2);
@@ -359,12 +366,40 @@ class MyScene extends THREE.Scene {
   }
 
   check_collisions(){
+    var cajaPJ = new THREE.Box3();
+    cajaPJ.setFromObject(this.PJ);
+    
+
+    for (let i = 0; i < this.spikes.length; i++) {
+      var cajaSpike = new THREE.Box3();
+      cajaSpike.setFromObject(this.spikes[i]);
+
+      if(cajaPJ.intersectsBox(cajaSpike)){
+        console.log("choque");
+      }    
+    }
+
+    for (let i = 0; i < this.hojas.length; i++) {
+      var cajaLeave = new THREE.Box3();
+      cajaLeave.setFromObject(this.hojas[i]);
+
+      if(cajaPJ.intersectsBox(cajaLeave)){
+        console.log("choque hoja");
+      }    
+    }
+
+    var cajaMeta = new THREE.Box3();
+    cajaMeta.setFromObject(this.meta);
+    if(cajaPJ.intersectsBox(cajaMeta)){
+      //this.velocity = this.velocity + 0.000001;
+      console.log(this.velocity);
+    }   
 
 
   }
 
   update () {
-    const time = Date.now() * 0.00001; // Controla la velocidad de la animación
+    const time = Date.now() * this.velocity; // Controla la velocidad de la animación
 
     this.updatePJ(time);
     this.updateCameraPosition(time);
