@@ -49,10 +49,16 @@ class Runa1 extends THREE.Object3D {
         const runa = new THREE.Mesh(geometry, material);
         runa.position.y = 0.6;
         runa.scale.x = 0.8;
+        runa.scale.copy( new THREE.Vector3(0.03,0.03,0.03));
         this.add(runa);
 
-
     }
+
+    update(){
+        //animar up and down
+    }
+
+    
 }
 
 export { Runa1 };

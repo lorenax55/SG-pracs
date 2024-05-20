@@ -12,6 +12,7 @@ import { Tubo } from './Tubo.js'
 import { PJ } from './PJ.js'
 import { Hoja } from './Hoja.js'
 import { Spike } from './Spike.js'
+import { Runa1 } from './Runa1.js'
 
 
 
@@ -64,8 +65,10 @@ class MyScene extends THREE.Scene {
 
     this.curve = new THREE.CatmullRomCurve3(puntos, true); // true para que la curva sea cerrada
     const material_verde = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-    const material_verde2 = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    const material_verde2 = new THREE.MeshPhongMaterial({ color: 0x32a852 });
     const material_pincho = new THREE.MeshPhongMaterial({ color: 0xf00f00 });
+    const material_purple = new THREE.MeshPhongMaterial({ color: 0xa020f0 });
+
 
 
     this.model = new Tubo(this.curve, material_verde);
@@ -73,7 +76,9 @@ class MyScene extends THREE.Scene {
 
     this.PJ = new PJ();
     this.add(this.PJ);
-    this.velocity = 0.00002;
+    this.velocity = 1;
+    this.distance = 0;
+
 
     const metaGeo = new THREE.BoxGeometry(0.2,3,3);
     this.meta = new THREE.Mesh(metaGeo, material_verde2);
@@ -106,7 +111,7 @@ class MyScene extends THREE.Scene {
     this.hojas = []
     for (let i = 0; i < 15; i++) {
       // Crear una nueva instancia de Hoja
-      const hoja = new Hoja(material_verde);
+      const hoja = new Hoja(material_verde2);
   
       // Generar un valor aleatorio para 't' entre 0 y 1
       const t = Math.random();
@@ -145,6 +150,22 @@ class MyScene extends THREE.Scene {
 
     this.add(spike);
     this.spikes.push(spike);
+
+  }
+
+  this.runas1 = []
+  for (let i = 0; i < 15; i++) {
+    const runa = new Runa1(material_purple);
+
+    const t = Math.random();
+
+    runa.position.copy(this.curve.getPointAt(t));
+
+    runa.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
+    //hay que posicionarlas bien respecto del tubo
+
+    this.add(runa);
+    this.runas1.push(runa);
 
   }
 
@@ -325,6 +346,7 @@ class MyScene extends THREE.Scene {
   updatePJ(t) {
     // Obtener la posición en la curva
     const position = this.curve.getPointAt(t % 1);
+    console.log(t%1)
 
     // Ajustar la posición para mantenerla a una altura constante sobre la curva
     //position.y += 0.15; // Aumenta la coordenada y por 0.1 unidades
@@ -352,15 +374,20 @@ class MyScene extends THREE.Scene {
   handleKeyDown(event, scene) {
     switch(event.key) {
         case 'ArrowRight':
-            // Aumentar el ángulo
-            scene.angle += 0.1;
-            //console.log(scene.angle);
-            break;
+          // Aumentar el ángulo
+          scene.angle += 0.1;
+          //console.log(scene.angle);
+          break;
         case 'ArrowLeft':
-            // Disminuir el ángulo
-            scene.angle -= 0.1;
-            //console.log(scene.angle);
-            break;
+          // Disminuir el ángulo
+          scene.angle -= 0.1;
+          //console.log(scene.angle);
+          break;
+        case 'ArrowUp':
+          // Disminuir el ángulo
+          scene.velocity += 0.1;
+          console.log("velocidad: "+scene.velocity);
+          break;
     }
     //print(scene.angle);
   }
@@ -375,7 +402,8 @@ class MyScene extends THREE.Scene {
       cajaSpike.setFromObject(this.spikes[i]);
 
       if(cajaPJ.intersectsBox(cajaSpike)){
-        console.log("choque");
+        //gestionar daño
+        //console.log("choque pincho");
       }    
     }
 
@@ -384,25 +412,25 @@ class MyScene extends THREE.Scene {
       cajaLeave.setFromObject(this.hojas[i]);
 
       if(cajaPJ.intersectsBox(cajaLeave)){
-        console.log("choque hoja");
+        //gestionar ganar vida
+        //console.log("choque hoja");
       }    
     }
 
     var cajaMeta = new THREE.Box3();
     cajaMeta.setFromObject(this.meta);
     if(cajaPJ.intersectsBox(cajaMeta)){
-      //this.velocity = this.velocity + 0.000001;
-      console.log(this.velocity);
+      this.velocity = this.velocity + 0.5;
     }   
 
 
   }
 
   update () {
-    const time = Date.now() * this.velocity; // Controla la velocidad de la animación
 
-    this.updatePJ(time);
-    this.updateCameraPosition(time);
+    this.updatePJ(this.distance);
+    this.updateCameraPosition(this.distance);
+    this.distance += this.velocity*0.0005;
 
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
