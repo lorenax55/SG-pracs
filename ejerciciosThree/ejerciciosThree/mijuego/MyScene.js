@@ -107,7 +107,9 @@ class MyScene extends THREE.Scene {
     this.angle = 0;
 
     //COLISIONES
-    
+    this.collisionCooldown = 1000; // cooldown time in milliseconds
+    this.lastCollisions = new Map(); // to store the last collision time    
+
     this.hojas = []
     for (let i = 0; i < 15; i++) {
       // Crear una nueva instancia de Hoja
@@ -168,6 +170,10 @@ class MyScene extends THREE.Scene {
     this.runas1.push(runa);
 
   }
+
+  //picking:
+  this.mouse = new THREE.Vector2();
+  this.raycaster = new THREE.Raycaster();
 
 
     
@@ -346,7 +352,7 @@ class MyScene extends THREE.Scene {
   updatePJ(t) {
     // Obtener la posición en la curva
     const position = this.curve.getPointAt(t % 1);
-    console.log(t%1)
+    //console.log(t%1)
 
     // Ajustar la posición para mantenerla a una altura constante sobre la curva
     //position.y += 0.15; // Aumenta la coordenada y por 0.1 unidades
@@ -371,6 +377,15 @@ class MyScene extends THREE.Scene {
 
   }
 
+  handleRuna1Click(selectedObject, rootObject, point) {
+    // Debugging information
+    console.log('Runa1 clicked at point:', point);
+    console.log('Selected Object:', selectedObject);
+    console.log('Root Object:', rootObject);
+
+    selectedObject.position.copy(new THREE.Vector3(1000,1000,1000));
+  }
+
   handleKeyDown(event, scene) {
     switch(event.key) {
         case 'ArrowRight':
@@ -386,51 +401,99 @@ class MyScene extends THREE.Scene {
         case 'ArrowUp':
           // Disminuir el ángulo
           scene.velocity += 0.1;
-          console.log("velocidad: "+scene.velocity);
+          //console.log("velocidad: "+scene.velocity);
           break;
     }
     //print(scene.angle);
   }
 
-  check_collisions(){
-    var cajaPJ = new THREE.Box3();
-    cajaPJ.setFromObject(this.PJ);
-    
+  onDocumentMouseDown(event, scene) {
+    // Get mouse position in normalized device coordinates (-1 to +1) for both components.
+    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  
+    // Update the raycaster with the camera and mouse position.
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+  
+    // Calculate objects intersecting the ray.
+    const intersects = this.raycaster.intersectObjects(this.runas1, true);
+  
+    if (intersects.length > 0) {
+      // Get the first intersected object.
+      const selectedObject = intersects[0].object;
+  
+      // Get the root Object3D from userData if needed.
+      const rootObject = selectedObject.userData.root || selectedObject;
+  
+      // Log or handle the selected object.
+      console.log('Picked Runa1 object:', selectedObject);
+      console.log('Root Object3D:', rootObject);
+  
+      // Handle what happens when a Runa1 is clicked
+      this.handleRuna1Click(selectedObject, rootObject, intersects[0].point);
+    }
+  }
 
+  check_collisions() {
+    const cajaPJ = new THREE.Box3();
+    cajaPJ.setFromObject(this.PJ);
+
+    const currentTime = Date.now();
+    //choques pinchos
     for (let i = 0; i < this.spikes.length; i++) {
-      var cajaSpike = new THREE.Box3();
+      const cajaSpike = new THREE.Box3();
       cajaSpike.setFromObject(this.spikes[i]);
 
-      if(cajaPJ.intersectsBox(cajaSpike)){
-        //gestionar daño
-        //console.log("choque pincho");
-      }    
+      const spikeId = `spike-${i}`;
+      const lastCollisionTime = this.lastCollisions.get(spikeId) || 0;
+
+      if (cajaPJ.intersectsBox(cajaSpike) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
+        this.lastCollisions.set(spikeId, currentTime);
+        // Handle damage
+        console.log("choque pincho");
+      }
     }
 
+    //choques hojas
     for (let i = 0; i < this.hojas.length; i++) {
-      var cajaLeave = new THREE.Box3();
+      const cajaLeave = new THREE.Box3();
       cajaLeave.setFromObject(this.hojas[i]);
 
-      if(cajaPJ.intersectsBox(cajaLeave)){
-        //gestionar ganar vida
-        //console.log("choque hoja");
-      }    
+      const leaveId = `leave-${i}`;
+      const lastCollisionTime = this.lastCollisions.get(leaveId) || 0;
+
+      if (cajaPJ.intersectsBox(cajaLeave) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
+        this.lastCollisions.set(leaveId, currentTime);
+        // Handle gaining life
+        console.log("choque hoja");
+      }
     }
 
-    var cajaMeta = new THREE.Box3();
+    //choque meta
+    const cajaMeta = new THREE.Box3();
     cajaMeta.setFromObject(this.meta);
-    if(cajaPJ.intersectsBox(cajaMeta)){
-      this.velocity = this.velocity + 0.5;
-    }   
 
+    const metaId = `meta`;
+    const lastCollisionTime = this.lastCollisions.get(metaId) || 0;
+
+    if (cajaPJ.intersectsBox(cajaMeta) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
+      this.lastCollisions.set(metaId, currentTime);
+      this.velocity += 0.5;
+      console.log("choque meta");
+    }
 
   }
+
 
   update () {
 
     this.updatePJ(this.distance);
     this.updateCameraPosition(this.distance);
     this.distance += this.velocity*0.0005;
+
+    for(let i=0; i<this.runas1.length ; i++){
+      this.runas1[i].update();
+    }
 
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
@@ -449,6 +512,8 @@ class MyScene extends THREE.Scene {
 }
 
 
+
+
 /// La función   main
 $(function () {
   
@@ -458,6 +523,8 @@ $(function () {
   // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
   window.addEventListener ("resize", () => scene.onWindowResize());
   window.addEventListener("keydown", (event) => scene.handleKeyDown(event, scene));
+  window.addEventListener("mousedown", (event) => scene.onDocumentMouseDown(event, scene));
+
 
   
   // Que no se nos olvide, la primera visualización.

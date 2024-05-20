@@ -52,11 +52,18 @@ class Runa1 extends THREE.Object3D {
         runa.scale.copy( new THREE.Vector3(0.03,0.03,0.03));
         this.add(runa);
 
+        this.time = 0;
+
     }
 
-    update(){
-        //animar up and down
+    update() {
+        //funcion que sube y baja el objeto continuamente
+        this.rotation.y += 0.1;
+        this.position.y += Math.sin(this.time)*0.01;
+        this.time += 0.1;
+        
     }
+        
 
     
 }
