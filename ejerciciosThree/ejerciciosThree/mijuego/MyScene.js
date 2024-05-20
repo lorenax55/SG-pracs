@@ -42,6 +42,10 @@ class MyScene extends THREE.Scene {
     
     // Tendremos una cámara con un control de movimiento con el ratón
     this.createCamera ();
+    this.createSecondCamera();
+    this.cameras = [this.camera, this.secondCamera];
+    this.activeCameraIndex = 0;
+    this.activeCamera = this.cameras[this.activeCameraIndex];
 
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
@@ -204,7 +208,46 @@ class MyScene extends THREE.Scene {
     // Debe orbitar con respecto al punto de mira de la cámara
     this.cameraControl.target = look;
   }
+
+  createSecondCamera() {
+    this.secondCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100);
+    this.secondCamera.position.set(0, 10, 0);
+    var look = new THREE.Vector3(0, 0, 0);
+    this.secondCamera.lookAt(look);
+    this.add(this.secondCamera);
+  }
+
+  updateCameraControls() {
+    console.log("actualizando controles");
+    // Eliminamos el control actual
+    if (this.cameraControl) {
+        this.cameraControl.dispose();
+    }
+    
+    // Creamos nuevos controles para la cámara activa
+    this.cameraControl = new TrackballControls(this.activeCamera, this.renderer.domElement);
+    
+    // Configuramos las velocidades de los movimientos
+    this.cameraControl.rotateSpeed = 5;
+    this.cameraControl.zoomSpeed = -2;
+    this.cameraControl.panSpeed = 0.5;
+    
+    // Debe orbitar con respecto al punto de mira de la cámara
+    this.cameraControl.target.set(0, 0, 0);
+    
+    // Actualizamos los controles
+    this.cameraControl.update();
+}
+
+  switchCamera() {
+    this.activeCameraIndex = (this.activeCameraIndex + 1) % this.cameras.length;
+    console.log(this.activeCameraIndex);
+    this.activeCamera = this.cameras[this.activeCameraIndex];
+    this.updateCameraControls();
+  }
   
+
+
 
   createGUI () {
     // Se crea la interfaz gráfica de usuario
@@ -293,7 +336,7 @@ class MyScene extends THREE.Scene {
   getCamera () {
     // En principio se devuelve la única cámara que tenemos
     // Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
-    return this.camera;
+    return this.activeCamera;
   }
   
   setCameraAspect (ratio) {
@@ -314,6 +357,7 @@ class MyScene extends THREE.Scene {
   }
 
   updateCameraPosition(t) {
+    //    *** HACER QUE LA CAMARA GUIRE CON EL PJ PARA QUE SIEMRE ESTÉ RECTO ***
     // Obtener la posición actual de PJ en la curva
     let pjPosition = this.PJ.position.clone();
     
@@ -403,6 +447,11 @@ class MyScene extends THREE.Scene {
           scene.velocity += 0.1;
           //console.log("velocidad: "+scene.velocity);
           break;
+        case 'ArrowDown':
+            // Disminuir el ángulo
+            scene.switchCamera();
+            console.log("space");
+            break;
     }
     //print(scene.angle);
   }
