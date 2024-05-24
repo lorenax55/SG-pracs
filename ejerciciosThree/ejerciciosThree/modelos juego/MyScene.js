@@ -14,6 +14,7 @@ import {Hoja} from '../mijuego/Hoja.js'
 import {PJ} from '../mijuego/PJ.js'
 import {Spike} from '../mijuego/Spike.js'
 import {Scroll} from '../mijuego/Scroll.js'
+import {BeeEnemy} from '../mijuego/BeeEnemy.js'
 
 
 
@@ -52,6 +53,8 @@ class MyScene extends THREE.Scene {
     // Todas las unidades están en metros
     this.axis = new THREE.AxesHelper (2);
     this.add (this.axis);
+
+    //this.bee = null;
     
 
     this.createGeometries();
@@ -99,6 +102,13 @@ class MyScene extends THREE.Scene {
         runa2.scale.set(1.1,1.1,1.1);
 
         this.add(runa2);
+
+        const bee = new BeeEnemy();
+        bee.position.set(0,0,0);
+        bee.scale.set(1,1,1);
+
+        this.add(bee);
+
 
     }
   
@@ -272,6 +282,8 @@ class MyScene extends THREE.Scene {
 
     update() {
         if (this.stats) this.stats.update();
+
+        //this.bee.update();
 
         // Actualizar la posición de la cámara según su controlador
         this.cameraControl.update();

@@ -23,13 +23,28 @@ class PJ extends THREE.Object3D {
 
         this.health = 3; 
         
-
+        this.pointLight = new THREE.PointLight( 0x3debbf );
+        this.pointLight.position.set( 0, 0.3, 0 );
+        this.pointLight.power = 0;
+        this.add (this.pointLight);
+        
     }
 
     get_damage(){
         this.health = this.health -1 ;
         console.log(this.health);
     }
+
+    turn_light_on() {
+        this.pointLight.power = 200; // Enciende la luz
+    
+        // Espera 0.5 segundos (500 milisegundos) y apaga la luz
+        setTimeout(() => {
+            this.pointLight.power = 0;
+        }, 500);
+    }
+
+
 
 }
 

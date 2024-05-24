@@ -13,6 +13,7 @@ import { PJ } from './PJ.js'
 import { Hoja } from './Hoja.js'
 import { Spike } from './Spike.js'
 import { Runa1 } from './Runa1.js'
+import { BeeEnemy } from './BeeEnemy.js'
 
 
 
@@ -39,13 +40,6 @@ class MyScene extends THREE.Scene {
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights ();
-    
-    // Tendremos una cámara con un control de movimiento con el ratón
-    this.createCamera ();
-    this.createSecondCamera();
-    this.cameras = [this.camera, this.secondCamera];
-    this.activeCameraIndex = 0;
-    this.activeCamera = this.cameras[this.activeCameraIndex];
 
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
@@ -82,6 +76,14 @@ class MyScene extends THREE.Scene {
     this.add(this.PJ);
     this.velocity = 1;
     this.distance = 0;
+
+    // Tendremos una cámara con un control de movimiento con el ratón
+    this.createCamera ();
+    this.createSecondCamera();
+    this.createPJcamera();
+    this.cameras = [this.camera, this.secondCamera, this.camerapj];
+    this.activeCameraIndex = 0;
+    this.activeCamera = this.cameras[this.activeCameraIndex];
 
 
     const metaGeo = new THREE.BoxGeometry(0.2,3,3);
@@ -175,6 +177,23 @@ class MyScene extends THREE.Scene {
 
   }
 
+  this.abejas = []
+  for (let i = 0; i < 15; i++) {
+    const abeja = new BeeEnemy();
+
+    const t = Math.random();
+
+    abeja.position.copy(this.curve.getPointAt(t));
+    abeja.position.y+=0.2;
+
+
+    //hay que posicionarlas bien respecto del tubo
+
+    this.add(abeja);
+    this.abejas.push(abeja);
+
+  }
+
   //picking:
   this.mouse = new THREE.Vector2();
   this.raycaster = new THREE.Raycaster();
@@ -209,6 +228,18 @@ class MyScene extends THREE.Scene {
     this.cameraControl.target = look;
   }
 
+  createPJcamera(){
+
+    this.camerapj = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+    this.camerapj.position.set (0, 1.5, -1);
+    var look = new THREE.Vector3 (0,0,0);
+    this.camerapj.lookAt(look);
+    this.PJ.add(this.camerapj);
+    
+    this.cameraControl = new TrackballControls (this.camerapj, this.renderer.domElement);
+    this.cameraControl.target = look;
+  }
+
   createSecondCamera() {
     this.secondCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100);
     this.secondCamera.position.set(0, 10, 0);
@@ -216,6 +247,8 @@ class MyScene extends THREE.Scene {
     this.secondCamera.lookAt(look);
     this.add(this.secondCamera);
   }
+
+
 
   updateCameraControls() {
     console.log("actualizando controles");
@@ -228,9 +261,11 @@ class MyScene extends THREE.Scene {
     this.cameraControl = new TrackballControls(this.activeCamera, this.renderer.domElement);
     
     // Configuramos las velocidades de los movimientos
+    /*
     this.cameraControl.rotateSpeed = 5;
     this.cameraControl.zoomSpeed = -2;
     this.cameraControl.panSpeed = 0.5;
+    */
     
     // Debe orbitar con respecto al punto de mira de la cámara
     this.cameraControl.target.set(0, 0, 0);
@@ -301,6 +336,13 @@ class MyScene extends THREE.Scene {
     this.pointLight.power = this.guiControls.lightPower;
     this.pointLight.position.set( 2, 3, 1 );
     this.add (this.pointLight);
+
+    this.pointLight2 = new THREE.SpotLight( 0xebce67 );
+    this.pointLight2.position.set( -1, 0, 0 );
+    this.pointLight2.power = 150;
+    this.add (this.pointLight2);
+
+
   }
   
   setLightPower (valor) {
@@ -390,7 +432,12 @@ class MyScene extends THREE.Scene {
     
     // La cámara debe mirar directamente a la posición actual de PJ
     this.camera.lookAt(pjPosition);
-}
+  }
+
+  updateCameraPjPosition(t){
+    this.camerapj.lookAt(this.PJ.position.clone());
+
+  }
 
 
   updatePJ(t) {
@@ -426,6 +473,8 @@ class MyScene extends THREE.Scene {
     console.log('Runa1 clicked at point:', point);
     console.log('Selected Object:', selectedObject);
     console.log('Root Object:', rootObject);
+
+    this.PJ.turn_light_on();
 
     selectedObject.position.copy(new THREE.Vector3(1000,1000,1000));
   }
@@ -538,10 +587,15 @@ class MyScene extends THREE.Scene {
 
     this.updatePJ(this.distance);
     this.updateCameraPosition(this.distance);
+    this.updateCameraPjPosition(this.distance);
     this.distance += this.velocity*0.0005;
 
     for(let i=0; i<this.runas1.length ; i++){
       this.runas1[i].update();
+    }
+
+    for(let i=0; i<this.abejas.length ; i++){
+      this.abejas[i].update();
     }
 
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
