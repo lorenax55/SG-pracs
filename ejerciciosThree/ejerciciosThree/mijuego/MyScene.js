@@ -81,7 +81,7 @@ class MyScene extends THREE.Scene {
     this.createCamera ();
     this.createSecondCamera();
     this.createPJcamera();
-    this.cameras = [this.camera, this.secondCamera, this.camerapj];
+    this.cameras = [this.camera, this.secondCamera, this.camerapj, this.PJ.get_camera()];
     this.activeCameraIndex = 0;
     this.activeCamera = this.cameras[this.activeCameraIndex];
 
@@ -168,6 +168,11 @@ class MyScene extends THREE.Scene {
     const t = Math.random();
 
     runa.position.copy(this.curve.getPointAt(t));
+    runa.position.x+=(Math.random()-0.5)*2;
+    runa.position.y+=(Math.random()-0.5)*2;
+
+    //muevelo en la direccion del normal a la curva un valor aleatorio entre 0.5 y 1
+    //mevelo en otro vector normal a la curva pero tambien normal al anterior lo mismo, entre 0.5 y
 
     runa.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
     //hay que posicionarlas bien respecto del tubo
@@ -182,16 +187,19 @@ class MyScene extends THREE.Scene {
     const abeja = new BeeEnemy();
 
     const t = Math.random();
+    const position = this.curve.getPointAt(t );
+    const tangent = this.curve.getTangentAt(t );
 
-    abeja.position.copy(this.curve.getPointAt(t));
-    abeja.position.y+=0.2;
+    abeja.position.copy(position);
 
+    const lookAtPosition = position.clone().add(-tangent);
 
-    //hay que posicionarlas bien respecto del tubo
+    //abeja.lookAt(lookAtPosition); 
+    const axis = new THREE.Vector3(0, 0, 1);
+    abeja.quaternion.multiplyQuaternions(abeja.quaternion, new THREE.Quaternion().setFromAxisAngle(axis, Math.random()*360));
 
     this.add(abeja);
     this.abejas.push(abeja);
-
   }
 
   //picking:

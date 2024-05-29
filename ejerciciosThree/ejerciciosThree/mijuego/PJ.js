@@ -26,7 +26,15 @@ class PJ extends THREE.Object3D {
         this.pointLight = new THREE.PointLight( 0x3debbf );
         this.pointLight.position.set( 0, 0.3, 0 );
         this.pointLight.power = 0;
-        this.add (this.pointLight);
+        this.add(this.pointLight);
+
+        this.mycamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+        this.mycamera.position.set (0, 1.5, -1);
+        
+        let look = new THREE.Vector3();
+        mesh.getWorldPosition(look);
+        this.mycamera.lookAt(look);
+        this.add(this.mycamera);
         
     }
 
@@ -42,6 +50,10 @@ class PJ extends THREE.Object3D {
         setTimeout(() => {
             this.pointLight.power = 0;
         }, 500);
+    }
+
+    get_camera(){
+        return this.mycamera;
     }
 
 
