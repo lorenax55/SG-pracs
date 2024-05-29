@@ -74,7 +74,7 @@ class MyScene extends THREE.Scene {
 
     this.PJ = new PJ();
     this.add(this.PJ);
-    this.velocity = 1;
+    this.velocity = 0.8;
     this.distance = 0;
 
     // Tendremos una cámara con un control de movimiento con el ratón
@@ -91,6 +91,7 @@ class MyScene extends THREE.Scene {
     const time = Date.now() * 0.00001 +0.02;
     this.meta.position.copy(this.curve.getPointAt(time % 1));
     this.add( this.meta);
+    this.meta.visible = false;
 
     // Crear un nuevo tubo con la nueva curva
     const newTube1 = new Tubo(this.curve, material_verde2);
@@ -99,9 +100,13 @@ class MyScene extends THREE.Scene {
 
 
     // Posicionar los tubos de manera que estén separados en el eje X
-    newTube1.position.x = 8;
-    newTube2.position.y = 8;
-    newTube3.position.z = 8;
+    newTube1.position.x = 6;
+    newTube2.position.y = 1.5;
+    newTube2.position.x = -3;
+    newTube2.position.z = -2;
+
+    newTube3.position.z = -3;
+    newTube3.position.y = -2;
 
     // Añadir el nuevo tubo a la escena o al objeto padre
     this.add(newTube1);
@@ -206,9 +211,77 @@ class MyScene extends THREE.Scene {
   this.mouse = new THREE.Vector2();
   this.raycaster = new THREE.Raycaster();
 
+  this.createGround();
+  this.createSkybox();
 
     
   }
+
+  // Añadir esto en el constructor de la clase MyScene
+
+  createGround() {
+    // Crear la geometría de un plano grande
+    const groundGeometry = new THREE.PlaneGeometry(200, 200);
+
+    // Crear un material para el suelo, puedes cambiar el color a tu preferencia
+    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0xA3D76D }); 
+
+    // Crear la malla del suelo
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+
+    // Rotar el plano para que esté horizontal
+    ground.rotation.x = - Math.PI / 2;
+    ground.position.y -= 3;
+
+    // Añadir sombras
+    ground.receiveShadow = true;
+
+    // Añadir el suelo a la escena
+    this.add(ground);
+
+    // Crear la geometría y material para los conos y cajas
+    const coneGeometry = new THREE.ConeGeometry(1, 4, 8);
+    const boxGeometry = new THREE.BoxGeometry(1, 4, 1);
+    const greenMaterial = new THREE.MeshPhongMaterial({ color: 0x64CB4B });
+
+    // Añadir conos y cajas en puntos aleatorios
+    const numObjects = 300; // Número total de conos y cajas
+
+    for (let i = 0; i < numObjects; i++) {
+        // Crear un cono o una caja al azar
+        const isCone = Math.random() > 0.5;
+        const mesh = isCone ? new THREE.Mesh(coneGeometry, greenMaterial) : new THREE.Mesh(boxGeometry, greenMaterial);
+
+        // Generar una posición aleatoria sobre el plano
+        const x = (Math.random() - 0.5) * 30;
+        const z = (Math.random() - 0.5) * 30;
+        const y = -3; // Asegurarse de que estén sobre el plano
+
+        // Establecer la posición de la malla
+        mesh.position.set(x, y, z);
+        mesh.scale.copy(new THREE.Vector3(0.2,0.2,0.2));
+
+        // Añadir sombras
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        // Añadir la malla a la escena
+        this.add(mesh);
+    }
+}
+
+
+  createSkybox() {
+    const loader = new THREE.CubeTextureLoader();
+    const texture = loader.load([
+      '../imgs/sky.png', '../imgs/sky.png',
+      '../imgs/sky.png', '../imgs/sky.png',
+      '../imgs/sky.png', '../imgs/sky.png'
+    ]);
+    this.background = texture;
+  }
+
+
   
   createCamera () {
     // Para crear una cámara le indicamos
@@ -347,7 +420,7 @@ class MyScene extends THREE.Scene {
 
     this.pointLight2 = new THREE.SpotLight( 0xebce67 );
     this.pointLight2.position.set( -1, 0, 0 );
-    this.pointLight2.power = 150;
+    this.pointLight2.power = 50;
     this.add (this.pointLight2);
 
 
@@ -584,7 +657,7 @@ class MyScene extends THREE.Scene {
 
     if (cajaPJ.intersectsBox(cajaMeta) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
       this.lastCollisions.set(metaId, currentTime);
-      this.velocity += 0.5;
+      this.velocity += 0.2;
       console.log("choque meta");
     }
 
