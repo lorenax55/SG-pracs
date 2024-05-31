@@ -1,12 +1,12 @@
-// JavaScript source code
 import * as THREE from '../libs/three.module.js';
-import { MTLLoader } from '../libs/MTLLoader.js'
-import { OBJLoader } from '../libs/OBJLoader.js'
+import { MTLLoader } from '../libs/MTLLoader.js';
+import { OBJLoader } from '../libs/OBJLoader.js';
 
 class Beetle extends THREE.Object3D {
     constructor() {
         super();
-        this.createGeometry()
+        this.material = null; // Inicializar el material como null
+        this.createGeometry();
     }
 
     createGeometry() {
@@ -18,9 +18,16 @@ class Beetle extends THREE.Object3D {
                 objectLoader.load('../models/beetle/beetle.obj',
                     (object) => {
                         this.add(object);
+                        if (object.children.length > 0) {
+                            // Asignar el material del primer hijo
+                            this.material = object.children[0].material;
+                        }
                     }, null, null);
             });
-        
+    }
+
+    get_material() {
+        return this.material;
     }
 }
 

@@ -7,6 +7,8 @@ class Scroll extends THREE.Object3D {
     constructor() {
         super();
         this.createGeometry()
+        this.time = 0;
+
     }
 
     createGeometry() {
@@ -17,9 +19,17 @@ class Scroll extends THREE.Object3D {
                 objectLoader.setMaterials(materials);
                 objectLoader.load('../models/scroll/scroll.obj',
                     (object) => {
+                        object.scale.set(0.1, 0.1, 0.1);
                         this.add(object);
                     }, null, null);
             });
+    }
+
+    update() {
+        //funcion que sube y baja el objeto continuamente
+        this.rotation.y += 0.1;
+        this.position.y += Math.sin(this.time)*0.01;
+        this.time += 0.1;
         
     }
 }

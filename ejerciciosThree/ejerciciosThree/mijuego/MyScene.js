@@ -13,6 +13,8 @@ import { PJ } from './PJ.js'
 import { Hoja } from './Hoja.js'
 import { Spike } from './Spike.js'
 import { Runa1 } from './Runa1.js'
+import { Runa2 } from './Runa2.js'
+import { Scroll } from './Scroll.js'
 import { BeeEnemy } from './BeeEnemy.js'
 
 
@@ -166,45 +168,38 @@ class MyScene extends THREE.Scene {
 
   }
 
-  this.runas1 = []
+
+
+  this.abejas = [];
+
   for (let i = 0; i < 15; i++) {
-    const runa = new Runa1(material_purple);
+      const abeja = new BeeEnemy();
 
-    const t = Math.random();
+      const t = Math.random();
+      const position = this.curve.getPointAt(t);
+      abeja.position.copy(position);
 
-    runa.position.copy(this.curve.getPointAt(t));
-    runa.position.x+=(Math.random()-0.5)*2;
-    runa.position.y+=(Math.random()-0.5)*2;
+      // Obtener la tangente de la curva en el punto `t`
+      const tangent = this.curve.getTangentAt(t).normalize();
 
-    //muevelo en la direccion del normal a la curva un valor aleatorio entre 0.5 y 1
-    //mevelo en otro vector normal a la curva pero tambien normal al anterior lo mismo, entre 0.5 y
+      // Generar una dirección aleatoria normal a la tangente
+      const normal = new THREE.Vector3(
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+          Math.random() - 0.5
+      ).normalize();
+      normal.cross(tangent).normalize();
 
-    runa.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
-    //hay que posicionarlas bien respecto del tubo
+      // Desplazar la posición de la abeja 0.3 unidades en la dirección normal
+      const displacement = normal.multiplyScalar(0.2);
+      abeja.position.add(displacement);
 
-    this.add(runa);
-    this.runas1.push(runa);
+      // Establecer el objetivo de la abeja
+      abeja.setTarget(this.PJ);
 
-  }
-
-  this.abejas = []
-  for (let i = 0; i < 15; i++) {
-    const abeja = new BeeEnemy();
-
-    const t = Math.random();
-    const position = this.curve.getPointAt(t );
-    const tangent = this.curve.getTangentAt(t );
-
-    abeja.position.copy(position);
-
-    const lookAtPosition = position.clone().add(-tangent);
-
-    //abeja.lookAt(lookAtPosition); 
-    const axis = new THREE.Vector3(0, 0, 1);
-    abeja.quaternion.multiplyQuaternions(abeja.quaternion, new THREE.Quaternion().setFromAxisAngle(axis, Math.random()*360));
-
-    this.add(abeja);
-    this.abejas.push(abeja);
+      // Añadir la abeja a la escena y al array de abejas
+      this.add(abeja);
+      this.abejas.push(abeja);
   }
 
   //picking:
@@ -214,8 +209,105 @@ class MyScene extends THREE.Scene {
   this.createGround();
   this.createSkybox();
 
+  this.createRuna1(material_purple);
+  this.createRuna2();
+  this.createScroll();
+
+
     
   }
+
+  createRuna1(material) {
+    this.runas1 = [];
+    for (let i = 0; i < 15; i++) {
+        const runa = new Runa1(material);
+
+        const t = Math.random();
+
+        runa.position.copy(this.curve.getPointAt(t));
+        runa.position.x += (Math.random() - 0.5) * 2;
+        runa.position.y += (Math.random() - 0.5) * 2;
+
+        // Mueve la runa en la dirección de un vector normal a la curva
+        const tangent = this.curve.getTangentAt(t).normalize();
+        const normal1 = new THREE.Vector3(
+            Math.random() - 0.5,
+            Math.random() - 0.5,
+            Math.random() - 0.5
+        ).normalize().cross(tangent).normalize();
+        runa.position.add(normal1.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+        // Mueve la runa en otra dirección normal a la curva y al vector anterior
+        const normal2 = new THREE.Vector3().crossVectors(tangent, normal1).normalize();
+        runa.position.add(normal2.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+        runa.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
+        this.add(runa);
+        this.runas1.push(runa);
+    }
+}
+
+createRuna2() {
+  this.runas2 = [];
+  for (let i = 0; i < 15; i++) {
+      const runa = new Runa2();
+
+      const t = Math.random();
+
+      runa.position.copy(this.curve.getPointAt(t));
+      runa.position.x += (Math.random() - 0.5) * 2;
+      runa.position.y += (Math.random() - 0.5) * 2;
+
+      // Mueve la runa en la dirección de un vector normal a la curva
+      const tangent = this.curve.getTangentAt(t).normalize();
+      const normal1 = new THREE.Vector3(
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+          Math.random() - 0.5
+      ).normalize().cross(tangent).normalize();
+      runa.position.add(normal1.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+      // Mueve la runa en otra dirección normal a la curva y al vector anterior
+      const normal2 = new THREE.Vector3().crossVectors(tangent, normal1).normalize();
+      runa.position.add(normal2.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+      runa.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
+      this.add(runa);
+      this.runas2.push(runa);
+  }
+}
+
+createScroll() {
+  this.scrolls = [];
+  for (let i = 0; i < 15; i++) {
+      const scroll = new Scroll();
+
+      const t = Math.random();
+
+      scroll.position.copy(this.curve.getPointAt(t));
+      scroll.position.x += (Math.random() - 0.5) * 2;
+      scroll.position.y += (Math.random() - 0.5) * 2;
+
+      // Mueve el scroll en la dirección de un vector normal a la curva
+      const tangent = this.curve.getTangentAt(t).normalize();
+      const normal1 = new THREE.Vector3(
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+          Math.random() - 0.5
+      ).normalize().cross(tangent).normalize();
+      scroll.position.add(normal1.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+      // Mueve el scroll en otra dirección normal a la curva y al vector anterior
+      const normal2 = new THREE.Vector3().crossVectors(tangent, normal1).normalize();
+      scroll.position.add(normal2.multiplyScalar(Math.random() * 0.5 + 0.5));
+
+      scroll.scale.copy(new THREE.Vector3(0.5, 0.5, 0.5));
+      this.add(scroll);
+      this.scrolls.push(scroll);
+  }
+}
+
+
 
   // Añadir esto en el constructor de la clase MyScene
 
@@ -557,7 +649,7 @@ class MyScene extends THREE.Scene {
 
     this.PJ.turn_light_on();
 
-    selectedObject.position.copy(new THREE.Vector3(1000,1000,1000));
+    selectedObject.countdwon();
   }
 
   handleKeyDown(event, scene) {
@@ -629,7 +721,8 @@ class MyScene extends THREE.Scene {
       if (cajaPJ.intersectsBox(cajaSpike) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
         this.lastCollisions.set(spikeId, currentTime);
         // Handle damage
-        console.log("choque pincho");
+        this.PJ.get_damage();
+        this.spikes[i].countdown();
       }
     }
 
@@ -673,6 +766,14 @@ class MyScene extends THREE.Scene {
 
     for(let i=0; i<this.runas1.length ; i++){
       this.runas1[i].update();
+    }
+
+    for(let i=0; i<this.runas2.length ; i++){
+      this.runas2[i].update();
+    }
+
+    for(let i=0; i<this.scrolls.length ; i++){
+      this.scrolls[i].update();
     }
 
     for(let i=0; i<this.abejas.length ; i++){

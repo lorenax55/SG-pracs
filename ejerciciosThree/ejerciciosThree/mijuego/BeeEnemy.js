@@ -1,61 +1,69 @@
 import * as THREE from 'three';
-import { BeeAla, BeeBody } from './Bee.js'
+import { BeeAla, BeeBody } from './Bee.js';
 import { Vector3 } from '../libs/three.module.js';
 
 class BeeEnemy extends THREE.Object3D {
     constructor() {
         super();  // Llama al constructor de la superclase
 
-        // Crea una geometría de plano. Los argumentos son ancho y alto.
-        //const geometry = new THREE.BoxGeometry(0.05,0.05,0.1);
+        const scale = new Vector3(0.02, 0.02, 0.02);
+        const offsetY = 0;
+        const rotation = Math.PI*1.5;
 
-        // Crea un material básico de color negro
-        //const material = new THREE.MeshBasicMaterial({ color: 0x000000 });  // Negro
+        // Nodo contenedor
+        this.beeNode = new THREE.Object3D();
 
-        // Crea un mesh combinando la geometría y el material
-        const scale = new Vector3(0.02,0.02,0.02)
-        const offsetY = 0.2;
-        const rotation = 90;
-
+        // Crea el cuerpo de la abeja
         const body = new BeeBody();
         body.scale.copy(scale);
-        body.position.y += offsetY;
+        //body.position.y += offsetY;
+        body.rotateY(rotation);
+        this.beeNode.add(body);
 
-        // Añade el mesh al objeto 3D (esto mismo, 'this')
-        this.add(body);
-
+        // Crea el ala 1
         this.ala1 = new BeeAla();
         this.ala1.scale.copy(scale);
-        this.ala1.position.y += offsetY;
+        //this.ala1.position.y += offsetY;
+        this.ala1.rotateY(rotation);
+        this.beeNode.add(this.ala1);
 
-        
-
-        // Añade el mesh al objeto 3D (esto mismo, 'this')
-        this.add(this.ala1);
-
+        // Crea el ala 2
         this.ala2 = new BeeAla();
         this.ala2.scale.copy(scale);
-        this.ala2.rotateY(Math.PI)
-        // Añade el mesh al objeto 3D (esto mismo, 'this')
-        this.add(this.ala2);
-        this.rotateY(-Math.PI*0.5);
-        this.ala2.position.y += offsetY;
+        this.ala2.rotateY(Math.PI);
+        //this.ala2.position.y += offsetY;
+        this.ala2.rotateY(rotation);
+        this.beeNode.add(this.ala2);
 
-        
+        // Añade el nodo contenedor al objeto 3D (esto mismo, 'this')
+        this.beeNode.position.y += offsetY;
+        this.add(this.beeNode);
+
         this.time = 0;
+        this.target = { position: new THREE.Vector3(0, 0, 0) }; // Inicializa el objetivo como un objeto con una propiedad position
     }
 
     update() {
-        //funcion que sube y baja el objeto continuamente
-        //this.position.y += Math.sin(this.time)*0.01;
-        this.ala1.rotateZ(-Math.sin(this.time)*0.1);
-        this.ala2.rotateZ(Math.sin(this.time)*0.1);
+        // Movimiento oscilatorio en el eje Y
+        this.position.y += Math.sin(this.time) * 0.006;
 
+        // Rotación de las alas
+        this.ala1.rotateZ(-Math.sin(this.time) * 0.1);
+        this.ala2.rotateZ(Math.sin(this.time) * 0.1);
 
         this.time += 0.1;
 
-        
+        if (this.target && this.target.position) {
+            this.beeNode.lookAt(this.target.position);
+        }
     }
+
+    setTarget(target){
+        this.target = target;
+
+    }
+
+
 
 }
 
