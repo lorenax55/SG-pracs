@@ -32,6 +32,13 @@ class Scroll extends THREE.Object3D {
         this.time += 0.1;
         
     }
+
+    countdown() {
+        this.position.x -= 1000;
+        setTimeout(() => {
+            this.position.x += 1000;
+        }, 2000);
+    }
 }
 
 export { Scroll };

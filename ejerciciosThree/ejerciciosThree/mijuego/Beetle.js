@@ -29,6 +29,16 @@ class Beetle extends THREE.Object3D {
     get_material() {
         return this.material;
     }
+
+    change_material(newMaterial) {
+        // Iterate over all children and assign the new material
+        this.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+                child.material = newMaterial;
+            }
+        });
+    }
+    
 }
 
 export { Beetle };

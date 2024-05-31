@@ -31,8 +31,14 @@ class Hoja extends THREE.Object3D {
         stem.position.y = 0.5;
 
         this.add(stem);
-
         
+    }
+
+    countdown() {
+        this.position.y -= 1000;
+        setTimeout(() => {
+            this.position.y += 1000;
+        }, 2000);
     }
 }
 

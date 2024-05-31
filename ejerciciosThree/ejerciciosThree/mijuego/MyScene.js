@@ -641,15 +641,42 @@ createScroll() {
 
   }
 
+  die() {
+    this.velocity = 0; // Resetear la velocidad inicial
+    this.PJ.die(); // Llamar a la función die del personaje
+    
+    // Esperar 2 segundos antes de detener y reiniciar el juego
+    setTimeout(() => {
+      this.velocity = 0.8; // Restaurar la velocidad inicial
+    }, 2000);
+  }
+
   handleRuna1Click(selectedObject, rootObject, point) {
-    // Debugging information
-    console.log('Runa1 clicked at point:', point);
-    console.log('Selected Object:', selectedObject);
-    console.log('Root Object:', rootObject);
+    console.log("RUNA1");
 
     this.PJ.turn_light_on();
+    this.PJ.heal();
+    selectedObject.parent.countdown(); //dame el nodo mas superior, no la malla
+  }
 
-    selectedObject.countdwon();
+  handleRuna2Click(selectedObject, rootObject, point) {
+    console.log("RUNA2: ", rootObject.parent);
+    this.PJ.turn_light2_on();
+    this.PJ.add_points(100);
+    rootObject.parent.countdown(); //dame el nodo mas superior, no la malla
+  }
+
+  handleScrollClick(selectedObject, rootObject, point) {
+    console.log("SCROLL: ",  rootObject.parent);
+    this.PJ.turn_light3_on();
+    this.PJ.attack_mode();
+    rootObject.parent.countdown(); //dame el nodo mas superior, no la malla
+  }
+
+  handleAbejaClick(selectedObject, rootObject, point) {
+    console.log('ABEJA: ',  rootObject.parent.parent.parent);
+
+    rootObject.parent.parent.parent.countdown(); //dame el nodo mas superior, no la malla
   }
 
   handleKeyDown(event, scene) {
@@ -679,31 +706,52 @@ createScroll() {
   }
 
   onDocumentMouseDown(event, scene) {
-    // Get mouse position in normalized device coordinates (-1 to +1) for both components.
+    // Obtener la posición del mouse en coordenadas de dispositivo normalizadas (-1 a +1) para ambos componentes.
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  
-    // Update the raycaster with the camera and mouse position.
+
+    // Actualizar el raycaster con la cámara y la posición del mouse.
     this.raycaster.setFromCamera(this.mouse, this.camera);
-  
-    // Calculate objects intersecting the ray.
-    const intersects = this.raycaster.intersectObjects(this.runas1, true);
-  
+
+    // Calcular los objetos que intersectan el rayo.
+    const intersects = this.raycaster.intersectObjects([...this.runas1, ...this.runas2, ...this.scrolls, ...this.abejas], true);
+
     if (intersects.length > 0) {
-      // Get the first intersected object.
-      const selectedObject = intersects[0].object;
-  
-      // Get the root Object3D from userData if needed.
-      const rootObject = selectedObject.userData.root || selectedObject;
-  
-      // Log or handle the selected object.
-      console.log('Picked Runa1 object:', selectedObject);
-      console.log('Root Object3D:', rootObject);
-  
-      // Handle what happens when a Runa1 is clicked
-      this.handleRuna1Click(selectedObject, rootObject, intersects[0].point);
+        // Obtener el primer objeto intersectado.
+        const selectedObject = intersects[0].object;
+
+        // Obtener el Object3D raíz a partir de userData si es necesario.
+        const rootObject = selectedObject.parent;
+
+        // Loguear o manejar el objeto seleccionado.
+        console.log('Objeto seleccionado:', selectedObject);
+        console.log('Object3D raíz:', rootObject);
+
+        // Manejar lo que sucede cuando se hace clic en un objeto Runa1, Runa2 o Scroll.
+        if (this.runas1.includes(selectedObject.parent)) {
+            // Manejar clic en Runa1ç+
+            console.log("runa1handle");
+            this.handleRuna1Click(selectedObject, rootObject, intersects[0].point);
+        } else if (this.runas2.includes(rootObject.parent)) {
+            // Manejar clic en Runa2
+            console.log("runa2handle");
+            this.handleRuna2Click(selectedObject, rootObject, intersects[0].point);
+        } else if (this.scrolls.includes(rootObject.parent)) {
+            // Manejar clic en Scroll
+            console.log("scrollHandle");
+            this.handleScrollClick(selectedObject, rootObject, intersects[0].point);
+        }
+        else if (this.abejas.includes(rootObject.parent.parent.parent) && this.PJ.get_attack()) {
+          // Manejar clic en Scroll
+          console.log("abejaHandle");
+          this.handleAbejaClick(selectedObject, rootObject, intersects[0].point);
+      }
+        else{
+          console.log("ninguno");
+        }
     }
-  }
+}
+
 
   check_collisions() {
     const cajaPJ = new THREE.Box3();
@@ -721,7 +769,13 @@ createScroll() {
       if (cajaPJ.intersectsBox(cajaSpike) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
         this.lastCollisions.set(spikeId, currentTime);
         // Handle damage
-        this.PJ.get_damage();
+        if(this.PJ.get_damage()){
+          this.die();
+        }
+
+        this.velocity -= 0.15;
+        if(this.velocity <= 0)
+          this.velocity = 0;
         this.spikes[i].countdown();
       }
     }
@@ -737,9 +791,29 @@ createScroll() {
       if (cajaPJ.intersectsBox(cajaLeave) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
         this.lastCollisions.set(leaveId, currentTime);
         // Handle gaining life
-        console.log("choque hoja");
+        this.velocity += 0.2;
+        this.PJ.add_points(10);
+        this.hojas[i].countdown();
       }
     }
+
+      // Colisiones con las abejas
+      for (let i = 0; i < this.abejas.length; i++) {
+        const cajaAbeja = new THREE.Box3();
+        cajaAbeja.setFromObject(this.abejas[i]);
+
+        const abejaId = `abeja-${i}`;
+        const lastCollisionTime = this.lastCollisions.get(abejaId) || 0;
+
+        if (cajaPJ.intersectsBox(cajaAbeja) && (currentTime - lastCollisionTime > this.collisionCooldown)) {
+            this.lastCollisions.set(abejaId, currentTime);
+            // Manejar daño al personaje principal
+            if (this.PJ.get_damage()) {
+                this.die();
+            }
+            // Otras acciones si es necesario
+        }
+      }
 
     //choque meta
     const cajaMeta = new THREE.Box3();

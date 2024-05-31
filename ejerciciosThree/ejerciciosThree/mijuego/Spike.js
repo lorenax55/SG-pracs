@@ -18,7 +18,7 @@ class Spike extends THREE.Object3D {
         this.position.y -= 1000;
         setTimeout(() => {
             this.position.y += 1000;
-        }, 1000);
+        }, 8000);
     }
 }
 

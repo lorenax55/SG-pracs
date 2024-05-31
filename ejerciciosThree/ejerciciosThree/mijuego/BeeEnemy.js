@@ -63,6 +63,13 @@ class BeeEnemy extends THREE.Object3D {
 
     }
 
+    countdown() {
+        this.position.x -= 10000;
+        setTimeout(() => {
+            this.position.x += 10000;
+        }, 2000);
+    }    
+
 
 
 }

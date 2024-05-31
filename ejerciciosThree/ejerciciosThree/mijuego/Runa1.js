@@ -63,6 +63,12 @@ class Runa1 extends THREE.Object3D {
         this.time += 0.1;
         
     }
+    countdown() {
+        this.position.x -= 10000;
+        setTimeout(() => {
+            this.position.x += 10000;
+        }, 2000);
+    }
         
 
     
