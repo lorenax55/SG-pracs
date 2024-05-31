@@ -11,7 +11,7 @@ import { Stats } from '../libs/stats.module.js'
 import {Runa1} from '../mijuego/Runa1.js'
 import {Runa2} from '../mijuego/Runa2.js'
 import {Hoja} from '../mijuego/Hoja.js'
-import {PJ} from '../mijuego/PJ.js'
+import {Beetle} from '../mijuego/Beetle.js'
 import {Spike} from '../mijuego/Spike.js'
 import {Scroll} from '../mijuego/Scroll.js'
 import {BeeEnemy} from '../mijuego/BeeEnemy.js'
@@ -68,13 +68,13 @@ class MyScene extends THREE.Scene {
 
         const runa = new Runa1(material1);
         runa.position.set(2,0,0);
-        runa.scale.set(0.3,0.3,0.3);
+        runa.scale.set(1.3,1.3,1.3);
 
         this.add(runa);
 
         const hoja = new Hoja(material1);
         hoja.position.set(-2,0,0);
-        hoja.scale.set(1.5,1.5,1.5);
+        hoja.scale.set(0.8,0.8,0.8);
 
         this.add(hoja);
         
@@ -84,28 +84,28 @@ class MyScene extends THREE.Scene {
         this.add(spike);
 
                 
-        const pj = new PJ();
+        const pj = new Beetle();
         pj.position.set(-2,0,2);
-        pj.scale.set(8,8,8);
+        pj.scale.set(0.2,0.2,0.2);
 
         this.add(pj);
 
 
         const scroll = new Scroll();
         scroll.position.set(2,1,-2);
-        scroll.scale.set(0.7,0.7,0.7);
+        scroll.scale.set(1.7,1.7,1.7);
 
         this.add(scroll);
 
         const runa2 = new Runa2();
         runa2.position.set(-2,1,-2);
-        runa2.scale.set(1.1,1.1,1.1);
+        runa2.scale.set(3,3,3);
 
         this.add(runa2);
 
         const bee = new BeeEnemy();
         bee.position.set(0,0,0);
-        bee.scale.set(1,1,1);
+        bee.scale.set(5,5,5);
 
         this.add(bee);
 
