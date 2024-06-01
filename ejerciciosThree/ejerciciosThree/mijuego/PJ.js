@@ -22,7 +22,7 @@ class PJ extends THREE.Object3D {
         this.mycamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
         this.mycamera.position.set(0, 1.5, -1);
 
-        let look = new THREE.Vector3(0, 0, 0);
+        let look = this.position;
         this.mesh.getWorldPosition(look);
         this.mycamera.lookAt(look);
         this.add(this.mycamera);
